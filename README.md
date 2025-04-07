@@ -1,25 +1,9 @@
 # RACER: A Lightweight Leaderless Consensus Algorithm for the IoT
-IoT devices refer to internet-connected objects that can collect and exchange data through
-embedded sensors and software. These devices range from household appliances to industrial
-equipment, all designed to enhance connectivity and automation. In distributed IoT networks,
-achieving reliable decision-making requires mechanisms for consensus among devices. Such
-mechanisms enable IoT systems to agree on a single state of truth without relying on central
-authorities, ensuring robust operation under varying conditions.
-Recently in the literature, Consensus mechanisms designed for IoT devices typically have
-three common problems: a reliance on synchronise networks and synchronised clocks, reliance
-on a centralised coordinator, or poor performance. To solve these three problems, we propose a
-new IoT consensus mechanism called the Randomised Asynchronous Consensus with Efficient
-Real-time Sampling (RACER). To remove the reliance on synchronised clocks and networks,
-we implemented the Sequenced Probabilistic Double-Echo (SPDE) algorithm and adapted it
-specifically for IoT environments. The SPDE gossip algorithm works asynchronously, without
-timing assumptions. To overcome the need for a centralised coordinator, we utilised SPDE
-gossip, as it requires no leaders, and a transaction ordering mechanism that is optimised for
-IoT sensor networks and requires no coordination.
-Finally, to maximise throughput for IoT networks, we developed a companion algorithm
-for our consensus mechanism RACER, called the Peer-assisted Latency-Aware Traffic Opti-
-misation algorithm, (PLATO). PLATO’s traffic optimisation assists RACER in scaling its
-throughput, and allows RACER to maintain a throughput of 700mb/s in both a 10 node
-network and 100 node network.
+Internet-of-Things (IoT) devices are interconnected objects embedded with sensors and software, enabling data collection and exchange. These devices encompass a wide range of applications, from household appliances to industrial systems, designed to enhance connectivity and automation. In distributed IoT networks, achieving reliable decision-making necessitates robust consensus mechanisms that allow devices to agree on a shared state of truth without reliance on central authorities. Such mechanisms are critical for ensuring system resilience under diverse operational conditions.
+Recent research has identified three common limitations in existing consensus mechanisms for IoT environments: dependence on synchronised networks and clocks, reliance on centralised coordinators, and suboptimal performance. To address these challenges, this paper introduces a novel consensus mechanism called Randomised Asynchronous Consensus with Efficient Real-time Sampling (RACER). The RACER framework eliminates the need for synchronised networks and clocks by implementing the Sequenced Probabilistic Double Echo (SPDE) algorithm, which operates asynchronously without timing assumptions. Furthermore, to mitigate the reliance on centralised coordinators, RACER leverages the SPDE gossip protocol, which inherently requires no leaders, combined with a lightweight transaction ordering mechanism optimised for IoT sensor networks.
+Rather than using a Blockchain for transaction ordering, we opted for an eventually consistent transaction ordering mechanism to specifically deal with high churn, asynchronous networks, and to allow devices to independently and deterministically order transactions.
+To enhance the throughput of IoT networks, this paper also proposes a complementary algorithm, Peer-assisted Latency-Aware Traffic Optimisation (PLATO), designed to maximise efficiency within RACER-based systems.
+The combination of RACER and PLATO is able to maintain a throughput of above 600 mb/s on a 100 node network, significantly outperforming the compared consensus mechanisms in terms of network node size and performance.
 
 # Docker Branch
 This branch contains the dockerised version of RACER. Docker allows each node to use individual threads, improving performance.
