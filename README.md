@@ -1,15 +1,22 @@
 # RACER: A Lightweight Leaderless Consensus Algorithm for the IoT
+Paper link: https://www.mdpi.com/2227-7080/13/4/151
+
 Internet-of-Things (IoT) devices are interconnected objects embedded with sensors and software, enabling data collection and exchange. These devices encompass a wide range of applications, from household appliances to industrial systems, designed to enhance connectivity and automation. In distributed IoT networks, achieving reliable decision-making necessitates robust consensus mechanisms that allow devices to agree on a shared state of truth without reliance on central authorities. Such mechanisms are critical for ensuring system resilience under diverse operational conditions.
 Recent research has identified three common limitations in existing consensus mechanisms for IoT environments: dependence on synchronised networks and clocks, reliance on centralised coordinators, and suboptimal performance. To address these challenges, this paper introduces a novel consensus mechanism called Randomised Asynchronous Consensus with Efficient Real-time Sampling (RACER). The RACER framework eliminates the need for synchronised networks and clocks by implementing the Sequenced Probabilistic Double Echo (SPDE) algorithm, which operates asynchronously without timing assumptions. Furthermore, to mitigate the reliance on centralised coordinators, RACER leverages the SPDE gossip protocol, which inherently requires no leaders, combined with a lightweight transaction ordering mechanism optimised for IoT sensor networks.
 Rather than using a Blockchain for transaction ordering, we opted for an eventually consistent transaction ordering mechanism to specifically deal with high churn, asynchronous networks, and to allow devices to independently and deterministically order transactions.
 To enhance the throughput of IoT networks, this paper also proposes a complementary algorithm, Peer-assisted Latency-Aware Traffic Optimisation (PLATO), designed to maximise efficiency within RACER-based systems.
 The combination of RACER and PLATO is able to maintain a throughput of above 600 mb/s on a 100 node network, significantly outperforming the compared consensus mechanisms in terms of network node size and performance.
 
+# RACER Architecture
+RACER and PLATO are designed to feed into each other in real time. RACER handles message broadcasting via a reliable broadcast algorithm + ZeroMQ. RACER also handles transaction ordering. As the network is asynchronous there's a transaction ordering algorithm with a tie-breaker mechanism (this wasn't implemented). PLATO uses the message latency in the data + system transactions to gauge system load. PLATO also uses latency information from our peers to gauge the health of the network. PLATO uses a weight value from our measurements + our peers measurements to get a holistic view of the network. PLATO also uses the Savgol filter in its measurements, this avoids rubberbanding and gives RACER clear instructions on how to batch messages together to stay within latency parameters given current network conditions.
+
+![RACER](racer.png)
+
 # Docker Branch
 This branch contains the dockerised version of RACER. Docker allows each node to use individual threads, improving performance.
 
 # Installation
-1. Make sure you have docker installed: https://docs.docker.com/get-started/get-docker/
+1. Make sure you have Docker installed: https://docs.docker.com/get-started/get-docker/
 2. `git clone https://github.com/brite3001/phd_consensus.git`
 3. `cd phd_consensus`
 4. Open `make_compose_file.py` and specify the number of nodes (I'd start with 10)
@@ -25,7 +32,7 @@ Wait about 30 seconds after running `docker compose up` and nodes will start say
 - `[High RSI - /\] T: 5.265 P/FQ: 2.632 W: 6.891 O/L: 97 O/P: 100`. 
 - `High RSI` indicates that the networks latency is trending upwards. 
 - `T` is the self.current_latency, which is PLATOs current estimate of the networks actual latency related to data messages (seconds). 
-- `P/FQ` is the self.publish_pending_frequency, which relates to the frequency at which protocol related messgaes are sent (seconds).
+- `P/FQ` is the self.publish_pending_frequency, which relates to the frequency at which protocol related messages are sent (seconds).
 - `W` is the weighted_latest_latency. This values uses our latency estimate with a 60% weighting, and our peers latency estimate with a 40% weighting.
 - `O/L` (our latency) is the RSI value of our nodes latency estimate. When RSI > 70 this indicates a rising trend (rising latency).
 - `O/P` (our peers latency) an RSI value our node calculates based on latency estimates given by our peers.
@@ -44,12 +51,12 @@ The warning logs track the ready and delivery phases of individual data messages
 ## INFO Logs (Networking Logs)
 This level of logging spams logs to the console, as its now printing protocol messages as they're received by nodes. You'll see messages like:
 `Received EchoResponse for -6708328354717717678 from 6942964365` and
-`Received ReadyResponse for 9014494830268039963 from 6942964365` which show invidiual protocol messages being passed around to nodes as part of RACER's broadcast protocol implementation.
+`Received ReadyResponse for 9014494830268039963 from 6942964365` which show individual protocol messages being passed around to nodes as part of RACER's broadcast protocol implementation.
 
 # What values can I change to test RACER?
 Remember, when making any code changes, make sure to re-run `docker build -t consensus .` before running `docker compose up`, or else changes won't be applied to the container.
 
-Unfortunatley RACERs source code is not well documented. However, here are some values you can easily adjust:
+Unfortunately RACERs source code is not well documented. However, here are some values you can easily adjust:
 
 ## src/main.py
 - On line 76 you can change the padding size of messages
